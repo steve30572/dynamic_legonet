@@ -4,3 +4,8 @@ legonet implementation explanation:
 	aux_coefficients and aux_combination is making the filters(weights)
 	self.lego is used as weight at first CNN
 	and second CNN is made with lego filters 
+
+
+Things to know:
+	np.unique---and parameters as well
+	lego_vgg.py analytics
