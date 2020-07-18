@@ -4,8 +4,9 @@ legonet implementation explanation:
 	aux_coefficients and aux_combination is making the filters(weights)
 	self.lego is used as weight at first CNN
 	and second CNN is made with lego filters 
-
+np.unique---and parameters as well
+np.unique-->returns elements with redundant values erased
+	if use with return_counts as True, it returns array with how many counts of one element in original array. 
 
 Things to know:
-	np.unique---and parameters as well
 	lego_vgg.py analytics
