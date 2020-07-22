@@ -52,7 +52,7 @@ def train(epoch):
   correct=0
   total=0
   end=time.time()
-  print("before")
+  #print("before")
   for batch_idx,(inputs,targets) in enumerate(trainloader):
     inputs,targets=inputs.cuda(),targets.cuda()
     data_time=time.time()
@@ -72,7 +72,7 @@ def train(epoch):
     logging.info('Train Epoch: %d Process: %d Total: %d    Loss: %.06f    Data Time: %.03f s    Model Time: %.03f s    Memory %.03fMB', 
                 epoch, batch_idx * len(inputs), len(trainloader.dataset), loss.item(), data_time - end, model_time - data_time, count_memory(model))
     end = time.time()
-    print("after")
+    #print("after")
 def test(epoch):
   model.eval()
   test_loss=0
