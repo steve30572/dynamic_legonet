@@ -87,7 +87,7 @@ def test(epoch):
       _, predicted=outputs.max(1)
       total +=targets.size(0)
       correct += predicted.eq(targets).sum().item()
-  return correct,test_loss/len(testloader)
+  return correct/total,test_loss/len(testloader)
 if __name__ == '__main__':
     cudnn.benchmark = True
     torch.cuda.manual_seed(2)
@@ -95,13 +95,18 @@ if __name__ == '__main__':
     torch.manual_seed(2)
     
     max_correct = 0
-    for epoch in range(400):
+    for epoch in range(400):#400
         if epoch == 10:
-            optimizer = optim.SGD([p for n, p in model.named_parameters() if p.requires_grad and 'combination' not in n], lr=args.lr, momentum = args.momentum, weight_decay = args.weight_decay)
+            optimizer = optim.SGD([p for n, p in model.named_parameters() if p.requires_grad and 'combination' not in n], lr=0.1, momentum = 0.9, weight_decay = 0.0005)
             scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer,390)
+        ###
+        optimizer.step()
+        ###
         scheduler.step()
         train(epoch)
         correct, loss = test(epoch)
+        print("train loss: ",loss)
+        print("accuracy: ",correct,epoch+1)
         if correct > max_correct:
             max_correct = correct
             torch.save(model.state_dict(), 'best_mlp.p')

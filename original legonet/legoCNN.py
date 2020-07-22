@@ -78,7 +78,6 @@ class vgg_16_lego(nn.Module):
       if isinstance(layer,LegoCNN):
         layer.STE(balance_weight)
        
-aux_coefficients=nn.Parameter(nn.init.kaiming_normal_(torch.rand(2,16,8,1,1)))
-print(aux_coefficients)
+
 
   
