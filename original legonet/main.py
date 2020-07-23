@@ -96,9 +96,9 @@ if __name__ == '__main__':
     
     max_correct = 0
     for epoch in range(400):#400
-        if epoch == 10:
-            optimizer = optim.SGD([p for n, p in model.named_parameters() if p.requires_grad and 'combination' not in n], lr=0.1, momentum = 0.9, weight_decay = 0.0005)
-            scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer,390)
+        #if epoch == 10:
+        #    optimizer = optim.SGD([p for n, p in model.named_parameters() if p.requires_grad and 'combination' not in n], lr=0.1, momentum = 0.9, weight_decay = 0.0005)
+        #    scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer,390)
         ###
         optimizer.step()
         ###
