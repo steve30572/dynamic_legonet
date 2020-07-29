@@ -15,7 +15,10 @@ class LegoCNN(nn.Module):
     self.first_filter=nn.Parameter(nn.init.kaiming_normal_(torch.rand(self.lego,self.lego_channel,self.kernel_size,self.kernel_size)))
     self.second_filter_coefficients=nn.Parameter(nn.init.kaiming_normal_(torch.rand(self.split,self.out,self.lego,1,1)))
     self.second_filter_combination=nn.Parameter(nn.init.kaiming_normal_(torch.rand(self.split,self.out,self.lego,1,1)))
+    #self.temp_1=0
   def forward(self,x):
+    global temp_1,first_lego, lego_lego
+    #print(x.size)
     with torch.autograd.set_detect_anomaly(True):
       self.temp_combination=torch.zeros(self.second_filter_combination.size()).cuda()
       self.temp_combination.scatter_(2,self.second_filter_combination.argmax(dim=2,keepdim=True),1).cuda()
@@ -24,50 +27,93 @@ class LegoCNN(nn.Module):
     #print(x.shape)
       self.input_dim=list(x.size())
     #print(self.input_dim)
-      if self.input_dim[2]>2:
-        self.dynamic=nn.Parameter(nn.init.kaiming_normal_(torch.rand(self.lego_channel,self.lego_channel,self.input_dim[2]-2,self.input_dim[2]-2))).cuda()
-      else:
-        self.dynamic=nn.Parameter(nn.init.kaiming_normal_(torch.rand(self.lego_channel,self.lego_channel,2,2))).cuda()
-      self.count=self.input_dim[0]//self.lego
-      second=nn.Parameter(torch.zeros(self.lego,self.lego_channel,self.kernel_size,self.kernel_size)).cuda()
-      #second.requires_grad=True
-   # third=nn.Parameter(torch.zeros(self.lego,self.lego_channel,self.kernel_size,self.kernel_size)).cuda()
-    ##
     
-   # self.first_filter=0
-     #yahoo=np.zeros((self.lego,self.lego_channel,self.kernel_size,self.kernel_size))
+      if self.input_dim[1]<=self.lego_channel:
+        print("A")
+        lego_lego=nn.Parameter(nn.init.kaiming_normal_(torch.rand(self.lego,self.lego_channel-input_dim[1],self.kernel_size,self.kernel_size)))
+        lego_lego.cuda()
+        print("A")
+        m=nn.MaxPool2d(self.input_dim[2]//3)
+        output=m(x)
+        output=output.cuda()
+        print("A")
+        if self.lego<=128:
+          print("A")
+          temp=output[0:self.lego]
+        else:
+          print("A")
+          wow=self.lego//128
+          for i in range(wow-1):
+            print("A")
+            temp=torch.cat((temp,temp))
+        lego_lego=torch.cat((lego_lego.cuda(),temp.cuda()),dim=1)
+
+      else:
+        print("B")
+        print(self.lego_channel, self.lego)  
+        #lego_lego=nn.Parameter(nn.init.kaiming_normal_(torch.rand(self.lego,self.lego_channel,self.kernel_size,self.kernel_size)))
+        print("yaya")
+        #lego_lego.cuda()
+        print("B")
+        m=nn.MaxPool2d(self.input_dim[2]//3)
+        m=m.cuda()
+        output=m(x)
+        #output=output.cuda()
+        print("B")
+        if self.lego<=128:
+          print("B")
+          lego_lego=output[0:self.lego,0:self.lego_channel]
+        else:
+          print("B")
+          wow=self.lego//128
+          for i in range(wow-1):
+            print("B")
+            output=torch.cat((output,output))
+          print("B")
+          lego_lego=output[:,0:self.lego_channel]
+
+      #print(self.lego//128)
+      #if (self.lego) >128:
+        #wow=self.lego//128
+        #print(wow)
+        #aaa=nn.Parameter(nn.init.kaiming_normal_(torch.rand(self.lego-128,self.lego_channel,self.kernel_size,self.kernel_size)))
+        #lego_lego=torch.cat((lego_lego.cuda(),aaa.cuda()),dim=0)
+      
+      print(self.lego_channel, lego_lego.shape, self.first_filter.shape)
+      for j in range(self.split):
+          
+          
+          first_lego=F.conv2d(x[:,j*self.lego_channel:(j+1)*self.lego_channel],lego_lego,padding=int(self.kernel_size/2))  #temp_1[:,j*self.lego_channel:(j+1)*self.lego_channel
+          
+          
+          second_kernel=self.second_filter_coefficients[j]*self.temp_combination[j]
+          #print(first_lego.shape,second_kernel.shape)
+          out+=F.conv2d(first_lego,second_kernel)
+      #print(out.shape)
+      #print("finish")
+      return out
     
     
      
       for i in range(self.split):
         if self.input_dim[2]==2:
-          temp_first=F.conv2d(x[:,i*self.lego_channel:(i+1)*self.lego_channel],self.dynamic,padding=1)
-        #print(temp_first.shape)
+          #self.temp_first=nn.Conv2d(self.lego_channel,self.lego,self.kernel_size)
+          self.temp_first=F.conv2d(x[:,i*self.lego_channel:(i+1)*self.lego_channel],self.dynamic,padding=1)
+        
         else:
-          temp_first=F.conv2d(x[:,i*self.lego_channel:(i+1)*self.lego_channel],self.dynamic)
-        for j in range(self.lego):
+          self.temp_first=F.conv2d(x[:,i*self.lego_channel:(i+1)*self.lego_channel],self.dynamic)
+        a=x[:,i*self.lego_channel:(i+1)*self.lego_channel]
+        print(self.temp_first[0].shape,second.shape, self.count, self.lego)
+       
+            
 
-          for k in range(self.count):
-            #a=0
-            #a=a+1
-            #print("before")
-            second=second+3
-            #print("after)")
-            #yahoo[j]=yahoo[j]+temp_first[self.count*j+k].cpu().var.detach().numpy()
-          #second=torch.from_numpy(yahoo)  
-         #second[j] = second[j]+temp_first[self.count*(j)+k]
-         #torch.add(second[j],temp_first[self.count*(j)+k])
-        #self.first_filter[j] += temp_first[self.count*(j)+k]
-
-        #first_lego=F.conv2d(x[:,i*self.lego_channel:(i+1)*self.lego_channel],self.first_filter,padding=int(self.kernel_size/2))
-
-
+        #print("here?")
         first_lego=F.conv2d(x[:,i*self.lego_channel:(i+1)*self.lego_channel],second,padding=int(self.kernel_size/2))
-      #out=out+first_lego
+    
         second_kernel=self.second_filter_coefficients[i]*self.temp_combination[i]
-      #out=out+F.conv2d(first_lego,self.second_filter_coefficients[i])
+
         out+=F.conv2d(first_lego,second_kernel)
-    #print("before out")
+   
       return out
   def STE(self,balance_weight):
     self.second_filter_combination.grad=self.temp_combination.grad
@@ -153,7 +199,17 @@ temp_c.requires_grad=True
 #print(temp_c[0][0])
 #print(example_3[0][0])
 kernel_2=example_2*temp_c
-print(kernel_2[0][0])
+m=nn.Conv2d(3,3,30)
+input=torch.randn(128,3,40,40)
+m=nn.MaxPool2d(40//3)
+
+output=m(input)
+print(output.shape)
+wow=2
+for i in range(wow-1):
+  print(i)
+
+#print(kernel_2[0][0])
 
 
 
