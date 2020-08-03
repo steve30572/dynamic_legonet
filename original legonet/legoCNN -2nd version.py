@@ -14,7 +14,7 @@ class LegoCNN(nn.Module):
     self.lego_2=int(self.lego//2)
     #self.first_filter=((torch.zeros(self.lego,self.lego_channel,self.kernel_size,self.kernel_size))).cuda()
     self.first_filter=nn.Parameter(nn.init.kaiming_normal_(torch.rand(2,self.lego_2,self.lego_channel,self.kernel_size,self.kernel_size))).cuda()
-    self.lego_lego=nn.Parameter(nn.init.kaiming_normal_(torch.cat((self.first_filter[0],self.first_filter[1]))
+    self.lego_lego=nn.Parameter(nn.init.kaiming_normal_(torch.cat((self.first_filter[0],self.first_filter[1]))))
     #self.lego_lego=nn.init.normal_(self.lego_lego)
 
     self.second_filter_coefficients=nn.Parameter(nn.init.kaiming_normal_(torch.rand(self.split,self.out,self.lego,1,1)))
@@ -90,7 +90,7 @@ class LegoCNN(nn.Module):
       elif i_count>np.ceil(compare):
         self.second_filter_combination.grad[:,:,i]=self.second_filter_combination.grad[:,:,i]+balance_weight*(np.floor(compare)-i_count)
 cfg={
-    'vgg16_lego':[64,64,64,'A',128,128,128,'A',256,256,256,'A',512,512,512,'A',512,512,512,'A'],     
+    'vgg16_lego':[128,128,128,'A',128,128,128,'A',256,256,256,'A',512,512,512,'A',512,512,512,'A'],     
 }
 
 class vgg_16_lego(nn.Module):
