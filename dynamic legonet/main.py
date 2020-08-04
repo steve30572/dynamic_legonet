@@ -59,10 +59,10 @@ def train(epoch):
     outputs=model(inputs)
     loss=criterion(outputs,targets)
     loss.backward()
-    model.STE(1e-4)
+    #model.STE(1e-4)
     optimizer.step()
-    if epoch < 10:
-      model.STE(1e-4)
+    #if epoch < 10:
+    #  model.STE(1e-4)
     optimizer.zero_grad()
     _, predicted=outputs.max(1)
     total += targets.size(0)
@@ -95,7 +95,9 @@ if __name__ == '__main__':
     torch.manual_seed(2)
     
     max_correct = 0
-    for epoch in range(400):#400
+    b_a=0
+    b_e=0
+    for epoch in range(200):#400
         #if epoch == 10:
         #    optimizer = optim.SGD([p for n, p in model.named_parameters() if p.requires_grad and 'combination' not in n], lr=0.1, momentum = 0.9, weight_decay = 0.0005)
         #    scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer,390)
@@ -109,7 +111,9 @@ if __name__ == '__main__':
         print("accuracy: ",correct,epoch+1)
         if correct > max_correct:
             max_correct = correct
+            b_e=epoch
             torch.save(model.state_dict(), 'best_mlp.p')
         logging.info('Epoch %d Correct: %d, Max Correct %d, Loss %.06f', epoch, correct, max_correct, loss)
+    print("best accuracy:",max_correct, b_e)
 
 
