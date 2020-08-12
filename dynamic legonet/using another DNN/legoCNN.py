@@ -9,6 +9,7 @@ import torch.optim as optim
 import torchvision.transforms as transforms
 global t1
 t1=0
+t2=0
 
 class LegoCNN(nn.Module):
   def __init__(self,ina,out,kernel_size,split,lego):
@@ -24,6 +25,12 @@ class LegoCNN(nn.Module):
 
     self.second_filter_coefficients=nn.Parameter(nn.init.kaiming_normal_(torch.rand(self.split,self.out,self.lego,1,1)))
     self.second_filter_combination=nn.Parameter(nn.init.kaiming_normal_(torch.rand(self.split,self.out,self.lego,1,1)))
+    self.m=nn.Conv2d(self.ina,self.ina,3,padding=1)
+    self.m=self.m.cuda()
+    self.k=nn.MaxPool2d(kernel_size=2,stride=2)
+    self.criterion2=nn.CrossEntropyLoss()
+    self.optimizer2=torch.optim.SGD(self.m.parameters(),lr=0.2)
+    self.scheduler2=optim.lr_scheduler.CosineAnnealingLR(self.optimizer2,10)
     #self.temp_1=0
   def forward(self,x):
     global temp_1,first_lego, lego_lego
@@ -40,51 +47,49 @@ class LegoCNN(nn.Module):
     #print(x.shape)
       self.input_dim=list(x.size())
     #print(self.input_dim)
-      m=nn.Conv2d(self.ina,self.ina,3,padding=1)
-      m=m.cuda()
+      
+      #m=m.cuda()
 #trainloader = torch.utils.data.DataLoader(trainset, batch_size=128, shuffle=True, pin_memory = True, num_workers=0)
       #first=nn.Parameter(nn.init.kaiming_normal_(torch.rand(128,3,3,3)))
       #first=first.cuda()
-      k=nn.MaxPool2d(kernel_size=2,stride=2)
-      k=k.cuda()
-      criterion2=nn.CrossEntropyLoss()
-      optimizer2 = torch.optim.SGD(m.parameters(), lr=0.2)
-      scheduler2=optim.lr_scheduler.CosineAnnealingLR(optimizer2,10)
+      
+      
+      #criterion2=nn.CrossEntropyLoss()
+      #optimizer2 = torch.optim.SGD(m.parameters(), lr=0.2)
+      #scheduler2=optim.lr_scheduler.CosineAnnealingLR(optimizer2,10)
 #print(kernel_2[0][0])
-      optimizer2.step()
+      if t2==0:
+        self.optimizer2.step()
         ###
-      scheduler2.step()
-      total=0
-      correct=0
+        self.scheduler2.step()
+        total=0
+        correct=0
       #global t1
       #print(t1)
-      if t1 !=1:
+        if t1 !=1:
        # print("asdasdsad")
-        for i in range(10):
-          #for j in range(x.size(0)):
-  #if batch_idx==0:
-          #inputs,targets=inputs.cuda(),targets.cuda()
-          #output=F.conv2d(x,first,padding=1)
-            output=m(x)
-            output=m(output)
-            output=m(output)
-            #output=k(output)
-            #output=m(output)
-            #output=m(output)
-            #output=m(output)
-            #output=k(output)
-            output=m(output)
-            output=m(output)
-            output=m(output)
-            #output=k(output)
-            output=m(output)
-            output=m(output)
-            output=m(output)
-            #output=k(output)
-            output=m(output)
-            output=m(output)
-            #output=m(output)
-            #output=k(output)
+          for i in range(10):
+          
+            output=self.m(x)
+            output=self.m(output)
+            output=self.m(output)
+            #output=self.k(output)
+            #output=self.m(output)
+            #output=self.m(output)
+            #output=self.m(output)
+            #output=self.k(output)
+            output=self.m(output)
+            output=self.m(output)
+            output=self.m(output)
+            #output=self.k(output)
+            output=self.m(output)
+            output=self.m(output)
+            output=self.m(output)
+            #output=self.k(output)
+            output=self.m(output)
+            output=self.m(output)
+            #output=self.m(output)
+            #output=self.k(output)
           #x=nn.Linear(128,10).cuda()
             #print("here")
             output=output.view(output.size(0),-1)
@@ -94,16 +99,16 @@ class LegoCNN(nn.Module):
             #print("here")
             output=FC(output)
             #print(output.size())
-            loss2=criterion2(output,self.label)
+            loss2=self.criterion2(output,self.label)
     #print(m.weight[0][0][0])
             if i!=9:
               loss2.backward(retain_graph=True)
             else:
               loss2.backward(retain_graph=True)
-            optimizer2.step()
+            self.optimizer2.step()
     #if epoch < 10:
     #  model.STE(1e-4)
-            optimizer2.zero_grad()
+            self.optimizer2.zero_grad()
     #print(m.weight[0][0][0])
           #_, predicted=output.max(1)
           #total += self.label.size(0)
@@ -115,28 +120,29 @@ class LegoCNN(nn.Module):
         #correct=0
         #print("here")
         #print(m.weight.size())
-        first_lego=F.conv2d(x,m.weight,padding=1)
+          first_lego=F.conv2d(x,self.m.weight,padding=1)
         #print(first_lego.size())
         #print("here")
-        if t1<7:
-          self.third_filter_coefficients=nn.Parameter(nn.init.kaiming_normal_(torch.rand(self.split,self.out,self.out,1,1))).cuda()
-          self.third_filter_combination=nn.Parameter(nn.init.kaiming_normal_(torch.rand(self.split,self.out,self.out,1,1))).cuda()
-          self.temp_combination2=torch.zeros(self.third_filter_combination.size()).cuda()
-          self.temp_combination2.scatter_(2,self.third_filter_combination.argmax(dim=2,keepdim=True),1).cuda()
-          self.temp_combination2.requires_grad=True
-        else:
-          self.third_filter_coefficients=nn.Parameter(nn.init.kaiming_normal_(torch.rand(self.split,self.out,self.ina,1,1))).cuda()
-          self.third_filter_combination=nn.Parameter(nn.init.kaiming_normal_(torch.rand(self.split,self.out,self.ina,1,1))).cuda()
-          self.temp_combination2=torch.zeros(self.third_filter_combination.size()).cuda()
-          self.temp_combination2.scatter_(2,self.third_filter_combination.argmax(dim=2,keepdim=True),1).cuda()
-          self.temp_combination2.requires_grad=True
-        second_kernel=self.third_filter_coefficients[0]*self.temp_combination2[0]
+          if t1<7:
+            self.third_filter_coefficients=nn.Parameter(nn.init.kaiming_normal_(torch.rand(self.split,self.out,self.out,1,1))).cuda()
+            self.third_filter_combination=nn.Parameter(nn.init.kaiming_normal_(torch.rand(self.split,self.out,self.out,1,1))).cuda()
+            self.temp_combination2=torch.zeros(self.third_filter_combination.size()).cuda()
+            self.temp_combination2.scatter_(2,self.third_filter_combination.argmax(dim=2,keepdim=True),1).cuda()
+            self.temp_combination2.requires_grad=True
+          else:
+            self.third_filter_coefficients=nn.Parameter(nn.init.kaiming_normal_(torch.rand(self.split,self.out,self.ina,1,1))).cuda()
+            self.third_filter_combination=nn.Parameter(nn.init.kaiming_normal_(torch.rand(self.split,self.out,self.ina,1,1))).cuda()
+            self.temp_combination2=torch.zeros(self.third_filter_combination.size()).cuda()
+            self.temp_combination2.scatter_(2,self.third_filter_combination.argmax(dim=2,keepdim=True),1).cuda()
+            self.temp_combination2.requires_grad=True
+          second_kernel=self.third_filter_coefficients[0]*self.temp_combination2[0]
       ####
         #print("here")
-        out +=F.conv2d(first_lego,second_kernel)
+          
+          out +=F.conv2d(first_lego,second_kernel)
         #print("end")
       #####
-        return out
+          return out
     
       #self.lego_lego=nn.Parameter(nn.init.kaiming_normal_(torch.rand(self.lego,self.lego_channel,self.kernel_size,self.kernel_size))).cuda()
       #first=random.randrange(0,2)
@@ -147,16 +153,43 @@ class LegoCNN(nn.Module):
       #for j in range(self.split):
           
           
-      first_lego=F.conv2d(x,self.lego_lego,padding=int(self.kernel_size/2))  #temp_1[:,j*self.lego_channel:(j+1)*self.lego_channel
+        first_lego=F.conv2d(x,self.lego_lego,padding=int(self.kernel_size/2))  #temp_1[:,j*self.lego_channel:(j+1)*self.lego_channel
+      #print("asdasd")
           
           
-      second_kernel=self.second_filter_coefficients[0]*self.temp_combination[0]
+        second_kernel=self.second_filter_coefficients[0]*self.temp_combination[0]
           #print(first_lego.shape,second_kernel.shape)
-      out+=F.conv2d(first_lego,second_kernel)
+        out+=F.conv2d(first_lego,second_kernel)
       #print(self.lego_lego.shape)
       #print(out.shape,  x.shape)
       #print("finish")
-      return out
+        return out
+      out=0
+      if t2==1:
+        if t1==1:
+          first_lego=F.conv2d(x,self.lego_lego,padding=1)
+          second_kernel=self.second_filter_coefficients[0]*self.temp_combination[0]
+          out+=F.conv2d(first_lego,second_kernel)
+          return out
+        else:
+          first_lego=F.conv2d(x,self.m.weight,padding=1)
+          if t1<7:
+            self.third_filter_coefficients=nn.Parameter(nn.init.kaiming_normal_(torch.rand(self.split,self.out,self.out,1,1))).cuda()
+            self.third_filter_combination=nn.Parameter(nn.init.kaiming_normal_(torch.rand(self.split,self.out,self.out,1,1))).cuda()
+            self.temp_combination2=torch.zeros(self.third_filter_combination.size()).cuda()
+            self.temp_combination2.scatter_(2,self.third_filter_combination.argmax(dim=2,keepdim=True),1).cuda()
+            self.temp_combination2.requires_grad=True
+          else:
+            self.third_filter_coefficients=nn.Parameter(nn.init.kaiming_normal_(torch.rand(self.split,self.out,self.ina,1,1))).cuda()
+            self.third_filter_combination=nn.Parameter(nn.init.kaiming_normal_(torch.rand(self.split,self.out,self.ina,1,1))).cuda()
+            self.temp_combination2=torch.zeros(self.third_filter_combination.size()).cuda()
+            self.temp_combination2.scatter_(2,self.third_filter_combination.argmax(dim=2,keepdim=True),1).cuda()
+            self.temp_combination2.requires_grad=True
+          second_kernel=self.third_filter_coefficients[0]*self.temp_combination2[0]
+          out +=F.conv2d(first_lego,second_kernel)
+          return out
+
+
     
     
      

@@ -43,11 +43,11 @@ classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship'
 model=vgg_16_lego('vgg16_lego',2,0.5,10)
 model=model.cuda()
 criterion=nn.CrossEntropyLoss()
-optimizer = torch.optim.SGD(model.parameters(), lr=0.15)# 0.1
+optimizer = torch.optim.SGD(model.parameters(), lr=0.1)
 scheduler=optim.lr_scheduler.CosineAnnealingLR(optimizer,400)
 
-def train2(epoch):
-  #model.train()
+def train(epoch):
+  model.train()
   train_loss=0
   correct=0
   total=0
@@ -55,14 +55,14 @@ def train2(epoch):
   #print("before")
   for batch_idx,(inputs,targets) in enumerate(trainloader):
     inputs,targets=inputs.cuda(),targets.cuda()
-    model.input(targets)
-    #print(inputs.shape)
     data_time=time.time()
+    model.make_label(targets)
     outputs=model(inputs)
+    #global t1
+    #t1=t1+1
     loss=criterion(outputs,targets)
-    #print("before backward")
+    #print("before first loss.backward")
     loss.backward()
-    #print("after backward")
     #model.STE(1e-4)
     optimizer.step()
     #if epoch < 10:
@@ -76,15 +76,18 @@ def train2(epoch):
     logging.info('Train Epoch: %d Process: %d Total: %d    Loss: %.06f    Data Time: %.03f s    Model Time: %.03f s    Memory %.03fMB', 
                 epoch, batch_idx * len(inputs), len(trainloader.dataset), loss.item(), data_time - end, model_time - data_time, count_memory(model))
     end = time.time()
+    global t1
+    t1=0
     #print("after")
 def test(epoch):
   model.eval()
   test_loss=0
   correct=0
   total=0
-  with torch.no_grad():
-    for batch_idx,(inputs,targets) in enumerate(testloader):
+  #with torch.no_grad():
+  for batch_idx,(inputs,targets) in enumerate(testloader):
       inputs,targets=inputs.cuda(),targets.cuda()
+      model.make_label(targets)
       outputs=model(inputs)
       loss=criterion(outputs,targets)
       test_loss +=loss.item()
@@ -99,6 +102,8 @@ if __name__ == '__main__':
     torch.manual_seed(2)
     
     max_correct = 0
+    b_a=0
+    b_e=0
     for epoch in range(1):#400
         #if epoch == 10:
         #    optimizer = optim.SGD([p for n, p in model.named_parameters() if p.requires_grad and 'combination' not in n], lr=0.1, momentum = 0.9, weight_decay = 0.0005)
@@ -107,14 +112,18 @@ if __name__ == '__main__':
         optimizer.step()
         ###
         scheduler.step()
-        train2(epoch)
+        train(epoch)
+        global t2
+        t2=1
+        
         correct, loss = test(epoch)
         print("train loss: ",loss)
         print("accuracy: ",correct,epoch+1)
         if correct > max_correct:
             max_correct = correct
+            b_e=epoch
             torch.save(model.state_dict(), 'best_mlp.p')
         logging.info('Epoch %d Correct: %d, Max Correct %d, Loss %.06f', epoch, correct, max_correct, loss)
-    print(max_correct)
+    print("best accuracy:",max_correct, b_e)
 
 
