@@ -36,7 +36,7 @@ n_classes = 10
 
 trainloader = torch.utils.data.DataLoader(trainset, batch_size=128, shuffle=True, pin_memory = True, num_workers=0)
 
-testloader = torch.utils.data.DataLoader(testset, batch_size=1024, shuffle=False, pin_memory = True, num_workers=0)
+testloader = torch.utils.data.DataLoader(testset, batch_size=128, shuffle=False, pin_memory = True, num_workers=0)
 
 classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
 
@@ -104,7 +104,7 @@ if __name__ == '__main__':
     max_correct = 0
     b_a=0
     b_e=0
-    for epoch in range(1):#400
+    for epoch in range(2):#400
         #if epoch == 10:
         #    optimizer = optim.SGD([p for n, p in model.named_parameters() if p.requires_grad and 'combination' not in n], lr=0.1, momentum = 0.9, weight_decay = 0.0005)
         #    scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer,390)
@@ -115,7 +115,7 @@ if __name__ == '__main__':
         train(epoch)
         global t2
         t2=1
-        
+
         correct, loss = test(epoch)
         print("train loss: ",loss)
         print("accuracy: ",correct,epoch+1)
