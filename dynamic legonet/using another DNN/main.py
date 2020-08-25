@@ -23,6 +23,7 @@ transform_train = transforms.Compose([
     transforms.ToTensor(),
     transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
 ])
+#(0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)
 
 transform_test = transforms.Compose([
     transforms.ToTensor(),
@@ -34,7 +35,7 @@ trainset = torchvision.datasets.CIFAR10(root='../data', train=True, download=Tru
 testset = torchvision.datasets.CIFAR10(root='../data', train=False, download=True, transform=transform_test)
 n_classes = 10
 
-trainloader = torch.utils.data.DataLoader(trainset, batch_size=128, shuffle=True, pin_memory = True, num_workers=0)
+trainloader = torch.utils.data.DataLoader(trainset, batch_size=128, shuffle=False, pin_memory = True, num_workers=0)
 
 testloader = torch.utils.data.DataLoader(testset, batch_size=128, shuffle=False, pin_memory = True, num_workers=0)
 
@@ -54,6 +55,7 @@ def train(epoch):
   end=time.time()
   #print("before")
   for batch_idx,(inputs,targets) in enumerate(trainloader):
+    print(batch_idx)
     inputs,targets=inputs.cuda(),targets.cuda()
     data_time=time.time()
     model.make_label(targets)
@@ -96,6 +98,7 @@ def test(epoch):
       correct += predicted.eq(targets).sum().item()
   return correct/total,test_loss/len(testloader)
 if __name__ == '__main__':
+    sys.setrecursionlimit(3000)
     cudnn.benchmark = True
     torch.cuda.manual_seed(2)
     cudnn.enabled = True
@@ -117,6 +120,7 @@ if __name__ == '__main__':
         t2=1
 
         correct, loss = test(epoch)
+        t2=0
         print("train loss: ",loss)
         print("accuracy: ",correct,epoch+1)
         if correct > max_correct:
