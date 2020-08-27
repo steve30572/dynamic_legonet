@@ -10,6 +10,7 @@ import torchvision.transforms as transforms
 global t1
 t1=0
 t2=0
+t3=0
 class DCNN(nn.Module):
   def __init__(self,ina,out):
     super(DCNN,self).__init__()
@@ -21,10 +22,22 @@ class DCNN(nn.Module):
     self.pool=nn.MaxPool2d(2,2)
     self.conv2=nn.Conv2d(self.in1,self.out,3,padding=1)
     self.conv3=nn.Conv2d(self.out,self.out,3,padding=1)
-    self.fc1=nn.Linear(self.out*32*32,84)
+    global t3
+    if t3<=2:
+      self.number=self.out*32*32
+    elif t3<=4:
+      self.number=self.out*16*16
+    elif t3<=6:
+      self.number=self.out*8*8
+    elif t3<=8:
+      self.number=self.out*4*4
+    elif t3<=10:
+      self.number=self.out*2*2
+    self.fc1=nn.Linear(self.number,84)
     self.fc2=nn.Linear(84,10)
     #s#elf.fc3=nn.Linear()
   def temp_forward(self,x):
+    #print(x.size())
     x=(F.relu(self.conv1(x)))
     #print(x.size())
     x=(F.relu(self.conv2(x)))
@@ -32,20 +45,22 @@ class DCNN(nn.Module):
     x=(F.relu(self.conv3(x)))
     return x
   def forward(self,x):
-    #print(x.size(),self.in1,  self.out)
+    global t1
+    #print(x.size(),self.in1,  self.out,self.number, t1 )
+    #print("here")
     x=(F.relu(self.conv1(x)))
+    #print("here")
     #print(x.size())
     x=(F.relu(self.conv2(x)))
     #print(x.size())
     x=(F.relu(self.conv3(x)))
     #print(x.size())
-    x=x.view(-1,self.out*32*32)
+    x=x.view(-1,self.number)
     #print(x.size())
-    #x=self.pool(x)
-    #print(x.size())
-    #print("here")
     x=F.relu(self.fc1(x))
+    #print(x.size())
     x=(self.fc2(x))
+    #print("here",x.size())
     return x
    
 
@@ -253,6 +268,8 @@ class TempCNN(nn.Module):
 class LegoCNN(nn.Module):
   def __init__(self,ina,out,kernel_size,split,lego):
     super(LegoCNN,self).__init__()
+    global t3
+    t3=t3+1
     self.ina, self.out,self.kernel_size,self.split=ina,out,kernel_size,split
     self.lego_channel=int(ina/split)
     self.lego=int(out*lego)
@@ -270,8 +287,8 @@ class LegoCNN(nn.Module):
     #self.model=self.model.cuda()
     self.k=nn.MaxPool2d(kernel_size=2,stride=2)
     self.criterion2=nn.CrossEntropyLoss()
-    self.optimizer2=torch.optim.SGD(self.model.parameters(),lr=0.005)
-    self.scheduler2=optim.lr_scheduler.CosineAnnealingLR(self.optimizer2,200)
+    self.optimizer2=torch.optim.SGD(self.model.parameters(),lr=0.008)
+    self.scheduler2=optim.lr_scheduler.CosineAnnealingLR(self.optimizer2,300)
     #self.temp_1=0
   def forward(self,x):
     global temp_1,first_lego, lego_lego
@@ -321,47 +338,39 @@ class LegoCNN(nn.Module):
           #print("aaa")
           self.model.train()
           #print("aaa")
-          for i in range(200):
+          for i in range(300):
           
             output1=self.model(x)
+            #print("bbb")
             #print("aaa")
 
             #print(output.size())
             loss2=self.criterion2(output1,self.label)
+            #print("bbb")
             #print(loss2.item())
             #print(t1,t2,loss2)
     #print(m.weight[0][0][0])
             if t2==0:
               loss2.backward(retain_graph=True) #retain_graph=True
+              #print("bbb")
               
               self.optimizer2.step()
+              #print("bbb")
     #if epoch < 10:
     #  model.STE(1e-4)
               self.optimizer2.zero_grad()
+              #print("bbb")
               _, predicted3=output1.max(1)
+              #print("bbb")
               #print(predicted3[1:10])
               #print(self.label[1:10])
               total4 = self.label.size(0)
+              #print("bbb")
               correct4 = predicted3.eq(self.label).sum().item()
-              print(loss2.item(), total4,correct4,correct4/total4,  i)
-    #print(m.weight[0][0][0])
-          #_, predicted=output.max(1)
-          #total += self.label.size(0)
-          #correct += predicted.eq(self.label).sum().item()
-    #print(total, correct)
-  #print("end")
-  #print(total, correct)
-        #total=0
-        #correct=0
-        #print("here")
-        #print(m.weight.size())
-          #self.first_1=nn.Parameter(nn.init.kaiming_normal_(self.model.getweight()))
-          #first_lego=F.conv2d(x,self.model.getweight(),padding=1)
-          #print(self.model.getweight().size(), self.lego_lego.size())
-        #print(first_lego.size())
-        #print("here")
-          #print(predicted3[1:10])
-          #print(self.label[1:10])
+              #print("bbb")
+              #print(loss2.item(), total4,correct4,correct4/total4,  i)
+              #print("bbb")
+   
           if t1<7:
             #print("aaa")
             self.third_filter_coefficients=nn.Parameter(nn.init.kaiming_normal_(torch.rand(self.split,self.out,self.ina,1,1))).cuda()
@@ -389,6 +398,7 @@ class LegoCNN(nn.Module):
           #print(second_kernel.get_device_name(0))
           #print(self.model.temp_forward(x).size(), second_kernel.size())
           out +=F.conv2d(self.model.temp_forward(x).cuda(),second_kernel)
+          print(out.size())
           #print("aaa")
         #print("end")
       #####
