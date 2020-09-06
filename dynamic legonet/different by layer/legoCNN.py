@@ -1,3 +1,4 @@
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -11,7 +12,7 @@ class LegoCNN(nn.Module):
     #self.label
     self.lego_channel=int(ina/split)
     self.lego=int(out*lego)
-    self.first_filter=nn.Parameter(nn.init.kaiming_normal_(torch.rand(10,self.lego,self.lego_channel,self.kernel_size,self.kernel_size)))
+    self.first_filter=nn.Parameter(nn.init.kaiming_normal_(torch.rand(10,self.lego,self.ina,self.kernel_size,self.kernel_size)))
     self.second_filter_coefficients=nn.Parameter(nn.init.kaiming_normal_(torch.rand(self.split,self.out,self.lego,1,1)))
     self.second_filter_combination=nn.Parameter(nn.init.kaiming_normal_(torch.rand(self.split,self.out,self.lego,1,1)))
   def forward(self,x):
@@ -20,18 +21,68 @@ class LegoCNN(nn.Module):
     self.temp_combination.scatter_(2,self.second_filter_combination.argmax(dim=2,keepdim=True),1).cuda()
     self.temp_combination.requires_grad=True
     out=0
+    #print(x.size())
     a=list(self.label.shape)
     #print(a[0])
-    for i in range(self.split):
-      for j in range(a[0]):
-        if j==0:
-          first_lego=F.conv2d(x[:,i*self.lego_channel:(i+1)*self.lego_channel],self.first_filter[self.label[j]],padding=int(self.kernel_size//2))
-        else:
-          temp=F.conv2d(x[:,i*self.lego_channel:(i+1)*self.lego_channel],self.first_filter[self.label[j]],padding=int(self.kernel_size//2))
-          first_lego=torch.cat((first_lego,temp))
-      #first_lego=F.conv2d(x[:,i*self.lego_channel:(i+1)*self.lego_channel],self.first_filter,padding=int(self.kernel_size/2))
-      second_kernel=self.second_filter_coefficients[i]*self.temp_combination[i]
-      out=out+F.conv2d(first_lego,second_kernel)
+    temp0=torch.zeros(1,self.lego,x.size(2),x.size(2)).cuda()
+    
+    for idx in range(x.size(0)):
+      if self.label[idx]==0:
+        real= torch.unsqueeze(x[idx], 0)
+        temp_out=F.conv2d(real,self.first_filter[0],padding=1)
+        temp0=torch.cat((temp0,temp_out))
+        
+      elif self.label[idx]==1:
+        real= torch.unsqueeze(x[idx], 0)
+        temp_out=F.conv2d(real,self.first_filter[1],padding=1)
+        temp0=torch.cat((temp0,temp_out))
+        
+      elif self.label[idx]==2:
+        real= torch.unsqueeze(x[idx], 0)
+        temp_out=F.conv2d(real,self.first_filter[2],padding=1)
+        temp0=torch.cat((temp0,temp_out))
+        
+      elif self.label[idx]==3:
+        real= torch.unsqueeze(x[idx], 0)
+        temp_out=F.conv2d(real,self.first_filter[3],padding=1)
+        temp0=torch.cat((temp0,temp_out))
+        
+      elif self.label[idx]==4:
+        real= torch.unsqueeze(x[idx], 0)
+        temp_out=F.conv2d(real,self.first_filter[4],padding=1)
+        temp0=torch.cat((temp0,temp_out))
+        
+      elif self.label[idx]==5:
+        real= torch.unsqueeze(x[idx], 0)
+        temp_out=F.conv2d(real,self.first_filter[5],padding=1)
+        temp0=torch.cat((temp0,temp_out))
+        
+      elif self.label[idx]==6:
+        real= torch.unsqueeze(x[idx], 0)
+        temp_out=F.conv2d(real,self.first_filter[6],padding=1)
+        temp0=torch.cat((temp0,temp_out))
+        
+      elif self.label[idx]==7:
+        real= torch.unsqueeze(x[idx], 0)
+        temp_out=F.conv2d(real,self.first_filter[7],padding=1)
+        temp0=torch.cat((temp0,temp_out))
+        
+      elif self.label[idx]==8:
+        real= torch.unsqueeze(x[idx], 0)
+        temp_out=F.conv2d(real,self.first_filter[8],padding=1)
+        temp0=torch.cat((temp0,temp_out))
+        
+      elif self.label[idx]==9:
+        real= torch.unsqueeze(x[idx], 0)
+        temp_out=F.conv2d(real,self.first_filter[9],padding=1)
+        temp0=torch.cat((temp0,temp_out))
+        
+    #first_lego=torch.cat((F.conv2d(temp0[1:],self.first_filter[0],padding=1),F.conv2d(temp1[1:],self.first_filter[1],padding=1),F.conv2d(temp2[1:],self.first_filter[2],padding=1),F.conv2d(temp3[1:],self.first_filter[3],padding=1),F.conv2d(temp4[1:],self.first_filter[4],padding=1),F.conv2d(temp5[1:],self.first_filter[5],padding=1),F.conv2d(temp6[1:],self.first_filter[6],padding=1),F.conv2d(temp7[1:],self.first_filter[7],padding=1),F.conv2d(temp8[1:],self.first_filter[8],padding=1),F.conv2d(temp9[1:],self.first_filter[9],padding=1)))
+    #print(temp0.size())
+    #print(temp0[1:].size())
+    second_kernel=self.second_filter_coefficients[0]*self.temp_combination[0]
+    out=out+F.conv2d(temp0[1:],second_kernel)
+    #print("finish")
     return out
   def make_label(self, y):
     self.label=y
@@ -52,7 +103,7 @@ class LegoCNN(nn.Module):
       elif i_count>np.ceil(compare):
         self.second_filter_combination.grad[:,:,i]=self.second_filter_combination.grad[:,:,i]+balance_weight*(np.floor(compare)-i_count)
 cfg={
-    'vgg16_lego':[64,64,64,'A',128,128,128,'A',256,256,256,'A',512,512,512,'A',512,512,512,'A'],     
+    'vgg16_lego':[64,64,'A',128,128,'A',256,256,'A',512,512,'A',512,512,'A'],     
 }
 
 class vgg_16_lego(nn.Module):
@@ -96,3 +147,4 @@ class vgg_16_lego(nn.Module):
       if isinstance(layer,LegoCNN):
         layer.STE(balance_weight)
        
+
