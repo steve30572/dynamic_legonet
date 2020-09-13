@@ -45,7 +45,7 @@ classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship'
 model=vgg_16_lego('vgg16_lego',1,0.5,10)
 model=model.cuda()
 criterion=nn.CrossEntropyLoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
+optimizer = torch.optim.SGD(model.parameters(), lr=0.153)   #SGD 0.1     (    /5   )
 scheduler=optim.lr_scheduler.CosineAnnealingLR(optimizer,400)
 
 def train(epoch):
@@ -111,7 +111,7 @@ if __name__ == '__main__':
     max_correct = 0
     b_a=0
     b_e=0
-    for epoch in range(200):#400
+    for epoch in range(400):#400
         #if epoch == 10:
         #    optimizer = optim.SGD([p for n, p in model.named_parameters() if p.requires_grad and 'combination' not in n], lr=0.1, momentum = 0.9, weight_decay = 0.0005)
         #    scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer,390)
@@ -133,3 +133,4 @@ if __name__ == '__main__':
             torch.save(model.state_dict(), 'best_mlp.p')
         logging.info('Epoch %d Correct: %d, Max Correct %d, Loss %.06f', epoch, correct, max_correct, loss)
     print("best accuracy:",max_correct, b_e)
+# result: 0.8617 337
