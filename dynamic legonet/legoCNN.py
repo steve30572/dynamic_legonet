@@ -210,10 +210,3 @@ for i in range(wow-1):
   print(i)
 
 #print(kernel_2[0][0])
-
-
-
-       
-
-
-  

@@ -1,0 +1,16 @@
+RNNLegonet:2.535222
+CoeffLegonet: 29.77
+OriginalLegonet:9.289098
+for index in range(len(test_data[i][2])):
+            features=0
+            for index2 in range(len(temp_data)):
+              features +=temp_data[index2][index]+1
+              
+            probability=math.log(features/total,2)
+            probability *=test_data[i][2][index]
+            snwjr+=probability
+          #snwjr=snwjr+math.log(prob_label[j],2)
+          prob_result.append(snwjr)
+
+
+     

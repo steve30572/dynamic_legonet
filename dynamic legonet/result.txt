@@ -1,0 +1,12 @@
+2nd version legonet
+ epoch 200  --> 0.9054 183
+
+like RNN:
+Adam 0.01 0.8736 366
+Adam 0.005 0.8833	
+
+
+
+layer
+Adam 0.003   0.9018 180
+         0.005		0.9092 342

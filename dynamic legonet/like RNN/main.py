@@ -45,8 +45,8 @@ classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship'
 model=vgg_16_lego('vgg16_lego',1,0.5,10)
 model=model.cuda()
 criterion=nn.CrossEntropyLoss()
-optimizer = torch.optim.SGD(model.parameters(), lr=0.153)   #SGD 0.1     (    /5   )
-scheduler=optim.lr_scheduler.CosineAnnealingLR(optimizer,400)
+optimizer = torch.optim.Adam(model.parameters(), lr=0.013)   #SGD 0.1     (    /5   )   #0.08 --> 0.8안됨  0.02->0.8 안됨
+#scheduler=optim.lr_scheduler.CosineAnnealingLR(optimizer,400)
 
 def train(epoch):
   model.train()
@@ -75,7 +75,7 @@ def train(epoch):
     _, predicted=outputs.max(1)
     total += targets.size(0)
     correct += predicted.eq(targets).sum().item()
-    print(total, correct)
+    #print(total, correct)
     train_loss +=loss.item()
     model_time=time.time()
     logging.info('Train Epoch: %d Process: %d Total: %d    Loss: %.06f    Data Time: %.03f s    Model Time: %.03f s    Memory %.03fMB', 
@@ -118,19 +118,19 @@ if __name__ == '__main__':
         ###
         optimizer.step()
         ###
-        scheduler.step()
+        #scheduler.step()
         train(epoch)
         #global t2
         #t2=1
 
         correct, loss = test(epoch)
         t2=0
-        print("train loss: ",loss)
-        print("accuracy: ",correct,epoch+1)
+        #print("train loss: ",loss)
+        #print("accuracy: ",correct,epoch+1)
         if correct > max_correct:
             max_correct = correct
             b_e=epoch
             torch.save(model.state_dict(), 'best_mlp.p')
-        logging.info('Epoch %d Correct: %d, Max Correct %d, Loss %.06f', epoch, correct, max_correct, loss)
+        print('Epoch %d Correct: %d, Max Correct %d, Loss %.06f', epoch, correct, max_correct, loss)
     print("best accuracy:",max_correct, b_e)
 # result: 0.8617 337

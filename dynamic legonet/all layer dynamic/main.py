@@ -44,7 +44,7 @@ classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship'
 model=vgg_16_lego('vgg16_lego',2,0.5,10)
 model=model.cuda()
 criterion=nn.CrossEntropyLoss()
-optimizer = torch.optim.SGD(model.parameters(), lr=0.1)
+optimizer = torch.optim.Adam(model.parameters(), lr=0.00005,weight_decay=0.6)
 scheduler=optim.lr_scheduler.CosineAnnealingLR(optimizer,400)
 
 def train(epoch):
@@ -55,16 +55,12 @@ def train(epoch):
   end=time.time()
   #print("before")
   for batch_idx,(inputs,targets) in enumerate(trainloader):
-    print(batch_idx)
-    if batch_idx==10:
-        break;
-    #print(batch_idx, targets[1],targets[3],targets[5],targets[7],targets[120])
+    #print(batch_idx)
     inputs[inputs!=inputs]=0
     inputs,targets=inputs.cuda(),targets.cuda()
     data_time=time.time()
     model.make_label(targets)
     outputs=model(inputs)
-    print(outputs[1])
     #global t1
     #t1=t1+1
     loss=criterion(outputs,targets)
@@ -93,7 +89,6 @@ def test(epoch):
   total=0
   #with torch.no_grad():
   for batch_idx,(inputs,targets) in enumerate(testloader):
-      
       inputs[inputs!=inputs]=0
       inputs,targets=inputs.cuda(),targets.cuda()
       model.make_label(targets)
@@ -114,7 +109,7 @@ if __name__ == '__main__':
     max_correct = 0
     b_a=0
     b_e=0
-    for epoch in range(2):#400
+    for epoch in range(400):#400
         #if epoch == 10:
         #    optimizer = optim.SGD([p for n, p in model.named_parameters() if p.requires_grad and 'combination' not in n], lr=0.1, momentum = 0.9, weight_decay = 0.0005)
         #    scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer,390)
