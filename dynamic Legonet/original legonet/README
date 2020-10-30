@@ -1,0 +1,4 @@
+implementation of original legonet from ICML2019 paper LegoNet: Efficient Convolutional neural Networks with Lego Filters
+
+	This paper copies VGG16 model. Instead of using original CNN, they used legonet 
+to implement Legonet

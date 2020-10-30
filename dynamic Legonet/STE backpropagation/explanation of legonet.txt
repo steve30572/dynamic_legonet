@@ -1,0 +1,13 @@
+legonet implementation explanation:
+	for example, if in channel=4, out channel=16 and n_split=2 and n_lego=0.5
+	this legonet is like doing CNN twice with (in,out) =(4,8)->(8,16)
+	aux_coefficients and aux_combination is making the filters(weights)
+	self.lego is used as weight at first CNN
+	and second CNN is made with lego filters 
+	nn.init.kaiming_normal_ function is a tool to avoid vanishing gradient problem or exploding gradient problem
+
+
+
+next, what scatter_ function does and more exact understanding of
+		
+

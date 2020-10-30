@@ -1,0 +1,19 @@
+how dynamically choose filter?
+
+	1. label targets
+	2. input-using another CNN
+	3. 연산과정을 줄이기 위해 고려
+		image의 parameter 고려
+		32*32 input size -- 3*3 kernel size
+		with 1 padding-> 32*32
+		x*3*3 -->x를 활용?
+		위치적인 filter, 계산적인 filter를 각각 설정
+	detail:
+		위치적인 filter
+		32*32 를 8*8 로 4개로 쪼개서 
+
+
+64->128로 바꾸고 128 128 3 3--> 128을 input 128개와 비교
+256  하나의 input당 2개
+512  하나의 input당 4개
+		

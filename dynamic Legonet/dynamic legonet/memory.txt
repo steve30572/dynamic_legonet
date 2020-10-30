@@ -1,0 +1,6 @@
+RNNLegonet:2.535222
+CoeffLegonet: 5.4615
+OriginalLegonet:9.289098
+
+
+     

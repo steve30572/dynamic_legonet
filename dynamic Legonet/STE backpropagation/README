@@ -1,0 +1,4 @@
+Since legonet uses STE(straight-through estimator), this is explanation about it
+
+when we quantize the floating point to integer, and train the model with many layers, vanishing gradient problem occurs and derivatives of activation function leads to 0. 
+To avoid this problem, STE suggests that when we backpropagate, we use different activation function and value of it does not equal to 0. This is simple code using pytorch to implement STE backpropagation

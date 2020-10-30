@@ -1,0 +1,1 @@
+legonet -16층 -0.1 learning rate, 400 epoch best accuracy:0.909 at epoch 306

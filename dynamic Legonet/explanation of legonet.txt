@@ -1,0 +1,14 @@
+legonet implementation explanation:
+	for example, if in channel=4, out channel=16 and n_split=2 and n_lego=0.5
+	this legonet is like doing CNN twice with (in,out) =(4,8)->(8,16)
+	aux_coefficients and aux_combination is making the filters(weights)
+	self.lego is used as weight at first CNN
+	and second CNN is made with lego filters 
+np.unique---and parameters as well
+np.unique-->returns elements with redundant values erased
+	if use with return_counts as True, it returns array with how many counts of one element in original array. 
+
+Things to know:
+	to dynamically choose, first study
+	lego_feature return size of array
+	how to choose dynamically from input

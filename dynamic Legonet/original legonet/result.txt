@@ -1,0 +1,6 @@
+
+3 time result
+accuracy	epoch 
+0.9098  	356
+0.9093	285
+0.9115	296

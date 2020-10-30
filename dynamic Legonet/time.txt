@@ -1,0 +1,6 @@
+1. CoeffLegonet
+ 1024*5=0.227*5
+2.RNNLegonet
+ 1024*5=0.16*5
+3.Original Legonet
+ 1024*5=0.34*5
